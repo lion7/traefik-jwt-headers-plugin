@@ -1,11 +1,11 @@
-displayName: JWT Logging Plugin
+displayName: JWT Headers
 type: middleware
 
-import: github.com/lion7/traefik-jwt-logging-plugin
+import: github.com/lion7/traefik-jwt-headers-plugin
 
-summary: 'Adds JWT info to access logging'
+summary: 'Traefik middleware plugin which forwards JWT claims as request headers'
 
 testData:
-  defaultmode: drop
+  defaultMode: drop
   claims:
     sub: keep

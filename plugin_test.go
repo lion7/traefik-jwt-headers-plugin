@@ -1,4 +1,4 @@
-package jwtlogging_test
+package jwtheaders_test
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	jwtlogging "github.com/lion7/traefik-jwt-logging-plugin"
+	jwtheaders "github.com/lion7/traefik-jwt-headers-plugin"
 )
 
 func TestJwt(t *testing.T) {
@@ -14,11 +14,11 @@ func TestJwt(t *testing.T) {
 	const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0Ijox" +
 		"NTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 
-	cfg := jwtlogging.CreateConfig()
+	cfg := jwtheaders.CreateConfig()
 	ctx := context.Background()
 	next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {})
 
-	handler, err := jwtlogging.New(ctx, next, cfg, "jwt-logging-plugin")
+	handler, err := jwtheaders.New(ctx, next, cfg, "jwt-headers-plugin")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,11 +46,11 @@ func TestNestedJwt(t *testing.T) {
 		"NTE2MjM5MDIyLCJvcmdhbml6YXRpb24iOnsiaWQiOiIwOTg3NjU0MzIxIiwibmFtZSI6IkRvZSBjb21wYW55In19.uhtuQtJgnt_V9vsTsr" +
 		"L9xoyYH8yOQYYG9KEGYjQT_zc"
 
-	cfg := jwtlogging.CreateConfig()
+	cfg := jwtheaders.CreateConfig()
 	ctx := context.Background()
 	next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {})
 
-	handler, err := jwtlogging.New(ctx, next, cfg, "jwt-logging-plugin")
+	handler, err := jwtheaders.New(ctx, next, cfg, "jwt-headers-plugin")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -81,15 +81,15 @@ func TestNestedJwtWithConfig(t *testing.T) {
 		"NTE2MjM5MDIyLCJvcmdhbml6YXRpb24iOnsiaWQiOiIwOTg3NjU0MzIxIiwibmFtZSI6IkRvZSBjb21wYW55In19.uhtuQtJgnt_V9vsTsr" +
 		"L9xoyYH8yOQYYG9KEGYjQT_zc"
 
-	cfg := jwtlogging.CreateConfig()
+	cfg := jwtheaders.CreateConfig()
 	cfg.DefaultMode = "drop"
-	cfg.Headers["sub"] = "keep"
-	cfg.Headers["organization.name"] = "keep"
+	cfg.Claims["sub"] = "keep"
+	cfg.Claims["organization.name"] = "keep"
 
 	ctx := context.Background()
 	next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {})
 
-	handler, err := jwtlogging.New(ctx, next, cfg, "jwt-logging-plugin")
+	handler, err := jwtheaders.New(ctx, next, cfg, "jwt-headers-plugin")
 	if err != nil {
 		t.Fatal(err)
 	}

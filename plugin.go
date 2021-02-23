@@ -1,5 +1,5 @@
-// Package jwtlogging Traefik plugin which adds JWT info to access logging.
-package jwtlogging
+// Package jwtheaders - Traefik middleware plugin which forwards JWT claims as request headers
+package jwtheaders
 
 import (
 	"bytes"
@@ -14,20 +14,20 @@ import (
 
 // Config the plugin configuration.
 type Config struct {
-	DefaultMode string            `json:"defaultmode"`
-	Headers     map[string]string `json:"headers,omitempty"`
+	DefaultMode string            `json:"defaultMode"`
+	Claims      map[string]string `json:"claims,omitempty"`
 }
 
 // CreateConfig creates the default plugin configuration.
 func CreateConfig() *Config {
 	return &Config{
 		DefaultMode: "keep",
-		Headers:     make(map[string]string),
+		Claims:      make(map[string]string),
 	}
 }
 
-// JwtLogging a JwtLogging plugin.
-type JwtLogging struct {
+// JwtHeaders a JwtHeaders plugin.
+type JwtHeaders struct {
 	next        http.Handler
 	defaultMode string
 	headers     map[string]string
@@ -35,18 +35,18 @@ type JwtLogging struct {
 	template    *template.Template
 }
 
-// New created a new JwtLogging plugin.
+// New created a new JwtHeaders plugin.
 func New(ctx context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
-	return &JwtLogging{
+	return &JwtHeaders{
 		defaultMode: config.DefaultMode,
-		headers:     config.Headers,
+		headers:     config.Claims,
 		next:        next,
 		name:        name,
-		template:    template.New("jwt-logging").Delims("[[", "]]"),
+		template:    template.New("jwt-headers").Delims("[[", "]]"),
 	}, nil
 }
 
-func (a *JwtLogging) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+func (a *JwtHeaders) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	for _, value := range req.Header.Values("Authorization") {
 		if strings.HasPrefix(value, "Bearer ") {
 			token := strings.TrimPrefix(value, "Bearer ")
@@ -78,7 +78,7 @@ func (a *JwtLogging) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	a.next.ServeHTTP(rw, req)
 }
 
-func (a *JwtLogging) setHeaders(jsonMap map[string]interface{}, req *http.Request, path string) {
+func (a *JwtHeaders) setHeaders(jsonMap map[string]interface{}, req *http.Request, path string) {
 	if len(a.headers) == 0 && a.defaultMode != "keep" {
 		return
 	}
