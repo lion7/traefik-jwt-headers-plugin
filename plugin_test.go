@@ -1,25 +1,20 @@
-package traefik_jwt_logging_plugin_test
+package jwtlogging_test
 
 import (
 	"context"
-	traefik_jwt_logging_plugin "github.com/lion7/traefik-jwt-logging-plugin"
+	jwtlogging "github.com/lion7/traefik-jwt-logging-plugin"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
 func TestJwtLogging(t *testing.T) {
-	cfg := traefik_jwt_logging_plugin.CreateConfig()
-	cfg.Headers["X-Host"] = "[[.Host]]"
-	cfg.Headers["X-Method"] = "[[.Method]]"
-	cfg.Headers["X-URL"] = "[[.URL]]"
-	cfg.Headers["X-URL"] = "[[.URL]]"
-	cfg.Headers["X-JwtLogging"] = "test"
+	cfg := jwtlogging.CreateConfig()
 
 	ctx := context.Background()
 	next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {})
 
-	handler, err := traefik_jwt_logging_plugin.New(ctx, next, cfg, "jwt-logging-plugin")
+	handler, err := jwtlogging.New(ctx, next, cfg, "jwt-logging-plugin")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -30,13 +25,14 @@ func TestJwtLogging(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	req.Header.Set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
 
 	handler.ServeHTTP(recorder, req)
 
-	assertHeader(t, req, "X-Host", "localhost")
-	assertHeader(t, req, "X-URL", "http://localhost")
-	assertHeader(t, req, "X-Method", "GET")
-	assertHeader(t, req, "X-JwtLogging", "test")
+	assertHeader(t, req, "X-JWT", "{\"sub\":\"1234567890\",\"name\":\"John Doe\",\"iat\":1516239022}")
+	assertHeader(t, req, "X-JWT-sub", "1234567890")
+	assertHeader(t, req, "X-JWT-name", "John Doe")
+	assertHeader(t, req, "X-JWT-iat", "1516239022")
 }
 
 func assertHeader(t *testing.T, req *http.Request, key, expected string) {

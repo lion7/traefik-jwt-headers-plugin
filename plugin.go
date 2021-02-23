@@ -1,41 +1,35 @@
-package traefik_jwt_logging_plugin
+package jwtlogging
 
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"text/template"
 )
 
 // Config the plugin configuration.
 type Config struct {
-	Headers map[string]string `json:"headers,omitempty"`
 }
 
 // CreateConfig creates the default plugin configuration.
 func CreateConfig() *Config {
-	return &Config{
-		Headers: make(map[string]string),
-	}
+	return &Config{}
 }
 
 // JwtLogging a JwtLogging plugin.
 type JwtLogging struct {
 	next     http.Handler
-	headers  map[string]string
 	name     string
 	template *template.Template
 }
 
 // New created a new JwtLogging plugin.
 func New(ctx context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
-	if len(config.Headers) == 0 {
-		return nil, fmt.Errorf("headers cannot be empty")
-	}
-
 	return &JwtLogging{
-		headers:  config.Headers,
 		next:     next,
 		name:     name,
 		template: template.New("jwt-logging").Delims("[[", "]]"),
@@ -43,22 +37,31 @@ func New(ctx context.Context, next http.Handler, config *Config, name string) (h
 }
 
 func (a *JwtLogging) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	for key, value := range a.headers {
-		tmpl, err := a.template.Parse(value)
-		if err != nil {
-			http.Error(rw, err.Error(), http.StatusInternalServerError)
-			return
+	for _, value := range req.Header.Values("Authorization") {
+		if strings.HasPrefix(value, "Bearer ") {
+			token := strings.TrimPrefix(value, "Bearer ")
+			body := strings.Split(token, ".")[1]
+			decodedBody, err := base64.RawStdEncoding.DecodeString(body)
+			if err != nil {
+				http.Error(rw, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			jsonBody := string(decodedBody)
+			req.Header.Set("X-JWT", jsonBody)
+
+			jsonMap := make(map[string]interface{})
+			dec := json.NewDecoder(bytes.NewReader(decodedBody))
+			dec.UseNumber()
+			err = dec.Decode(&jsonMap)
+			if err != nil {
+				http.Error(rw, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			for key, value := range jsonMap {
+				s := fmt.Sprintf("%v", value)
+				req.Header.Set("X-JWT-"+key, s)
+			}
 		}
-
-		writer := &bytes.Buffer{}
-
-		err = tmpl.Execute(writer, req)
-		if err != nil {
-			http.Error(rw, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		req.Header.Set(key, writer.String())
 	}
 
 	a.next.ServeHTTP(rw, req)
