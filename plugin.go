@@ -1,4 +1,4 @@
-// Package jwtheaders - Traefik middleware plugin which forwards JWT claims as request headers
+// Package traefik_jwt_headers_plugin - Traefik middleware plugin which forwards JWT claims as request headers
 package traefik_jwt_headers_plugin
 
 import (
