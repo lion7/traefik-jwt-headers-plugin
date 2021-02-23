@@ -6,6 +6,6 @@ import: github.com/lion7/traefik-jwt-logging-plugin
 summary: 'Adds JWT info to access logging'
 
 testData:
-  Headers:
-    X-JwtLogging: test
-    X-URL: '{{URL}}'
+  defaultmode: drop
+  claims:
+    sub: keep
