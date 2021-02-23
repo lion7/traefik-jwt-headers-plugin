@@ -1,4 +1,4 @@
-package jwtheaders_test
+package traefik_jwt_headers_plugin_test
 
 import (
 	"context"
