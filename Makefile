@@ -5,7 +5,7 @@ export GO111MODULE=on
 default: lint test
 
 lint:
-	golangci-lint run -D golint
+	golangci-lint run -e "underscore in package name"
 
 test:
 	go test -v -cover ./...
