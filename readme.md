@@ -17,7 +17,7 @@ experimental:
 
 additionalArguments:
 - --experimental.plugins.jwt-headers.moduleName=github.com/lion7/traefik-jwt-headers-plugin
-- --experimental.plugins.jwt-headers.version=v0.0.1
+- --experimental.plugins.jwt-headers.version=v0.0.3
 ```
 
 ### Installation via command line
