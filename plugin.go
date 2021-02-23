@@ -1,5 +1,4 @@
-// Package plugindemo a demo plugin.
-package plugindemo
+package traefik_jwt_logging_plugin
 
 import (
 	"bytes"
@@ -21,29 +20,29 @@ func CreateConfig() *Config {
 	}
 }
 
-// Demo a Demo plugin.
-type Demo struct {
+// JwtLogging a JwtLogging plugin.
+type JwtLogging struct {
 	next     http.Handler
 	headers  map[string]string
 	name     string
 	template *template.Template
 }
 
-// New created a new Demo plugin.
+// New created a new JwtLogging plugin.
 func New(ctx context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
 	if len(config.Headers) == 0 {
 		return nil, fmt.Errorf("headers cannot be empty")
 	}
 
-	return &Demo{
+	return &JwtLogging{
 		headers:  config.Headers,
 		next:     next,
 		name:     name,
-		template: template.New("demo").Delims("[[", "]]"),
+		template: template.New("jwt-logging").Delims("[[", "]]"),
 	}, nil
 }
 
-func (a *Demo) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+func (a *JwtLogging) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	for key, value := range a.headers {
 		tmpl, err := a.template.Parse(value)
 		if err != nil {

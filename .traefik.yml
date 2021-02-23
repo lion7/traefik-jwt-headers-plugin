@@ -7,5 +7,5 @@ summary: 'Adds JWT info to access logging'
 
 testData:
   Headers:
-    X-Demo: test
+    X-JwtLogging: test
     X-URL: '{{URL}}'
