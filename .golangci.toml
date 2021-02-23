@@ -2,6 +2,7 @@
   timeout = "3m"
   skip-files = []
   skip-dirs = []
+  exclude = ["don't use an underscore in package name"]
 
 [linters-settings]
 
