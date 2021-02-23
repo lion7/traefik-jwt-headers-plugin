@@ -1,4 +1,4 @@
-# traefik-jwt-headers-plugin ![Build](https://github.com/lion7/traefik-jwt-headers-plugin/workflows/build/badge.svg)
+# traefik-jwt-headers-plugin ![Build](https://github.com/lion7/traefik-jwt-headers-plugin/actions/workflows/main.yml/badge.svg)
 Traefik middleware plugin which forwards JWT claims as request headers
 
 ## Installation
