@@ -1,3 +1,4 @@
+// Package jwtlogging Traefik plugin which adds JWT info to access logging.
 package jwtlogging
 
 import (
@@ -12,8 +13,7 @@ import (
 )
 
 // Config the plugin configuration.
-type Config struct {
-}
+type Config struct{}
 
 // CreateConfig creates the default plugin configuration.
 func CreateConfig() *Config {
@@ -41,22 +41,26 @@ func (a *JwtLogging) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		if strings.HasPrefix(value, "Bearer ") {
 			token := strings.TrimPrefix(value, "Bearer ")
 			body := strings.Split(token, ".")[1]
+
 			decodedBody, err := base64.RawStdEncoding.DecodeString(body)
 			if err != nil {
 				http.Error(rw, err.Error(), http.StatusInternalServerError)
 				return
 			}
+
 			jsonBody := string(decodedBody)
 			req.Header.Set("X-JWT", jsonBody)
 
 			jsonMap := make(map[string]interface{})
 			dec := json.NewDecoder(bytes.NewReader(decodedBody))
 			dec.UseNumber()
+
 			err = dec.Decode(&jsonMap)
 			if err != nil {
 				http.Error(rw, err.Error(), http.StatusInternalServerError)
 				return
 			}
+
 			for key, value := range jsonMap {
 				s := fmt.Sprintf("%v", value)
 				req.Header.Set("X-JWT-"+key, s)
