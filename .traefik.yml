@@ -1,9 +1,9 @@
-displayName: Demo Plugin
+displayName: JWT Logging Plugin
 type: middleware
 
-import: github.com/traefik/plugindemo
+import: github.com/lion7/traefik-jwt-logging-plugin
 
-summary: '[Demo] Add Request Header'
+summary: 'Adds JWT info to access logging'
 
 testData:
   Headers:
