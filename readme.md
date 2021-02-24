@@ -5,7 +5,7 @@ Traefik middleware plugin which forwards JWT claims as request headers
 The plugin needs to be configured in the Traefik static configuration before it can be used.
 
 ### Installation with Helm
-The following snippet can be used as an example for the values.yaml file:
+The following snippet can be used as an example for the `values.yaml` file:
 ```values.yaml
 pilot:
   enabled: true
@@ -16,16 +16,16 @@ experimental:
     enabled: true
 
 additionalArguments:
-- --experimental.plugins.jwt-headers.moduleName=github.com/lion7/traefik-jwt-headers-plugin
-- --experimental.plugins.jwt-headers.version=v0.0.3
+- --experimental.plugins.traefik-jwt-headers-plugin.modulename=github.com/lion7/traefik-jwt-headers-plugin
+- --experimental.plugins.traefik-jwt-headers-plugin.version=v0.0.3
 ```
 
 ### Installation via command line
 ```
 traefik \
   --experimental.pilot.token=xxxx-xxxx-xxx \
-  --experimental.plugins.jwt-headers.moduleName=github.com/lion7/traefik-jwt-headers-plugin \
-  --experimental.plugins.jwt-headers.version=v0.0.3
+  --experimental.plugins.traefik-jwt-headers-plugin.moduleName=github.com/lion7/traefik-jwt-headers-plugin \
+  --experimental.plugins.traefik-jwt-headers-plugin.version=v0.0.3
 ```
 
 ## Configuration
@@ -45,10 +45,10 @@ The `defaultMode` for `claims` is `drop`.
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  name: my-jwt-headers
+  name: my-traefik-jwt-headers-plugin
 spec:
   plugin:
-    jwt-headers:
+    traefik-jwt-headers-plugin:
       defaultMode: drop
       claims:
         sub: keep
@@ -59,30 +59,32 @@ spec:
 
 ### File (TOML)
 ```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.my-jwt-headers.plugin.jwt-headers]
-    defaultMode = "drop"
-    
-    [http.middlewares.my-jwt-headers.plugin.jwt-headers.claims]
-      "sub" = "keep"
-      "mysecret" = "drop"
-      "user.name" = "keep"
-      "organization.name" = "keep"
+[http]
+  [http.middlewares]
+    [http.middlewares.my-traefik-jwt-headers-plugin]
+      [http.middlewares.my-traefik-jwt-headers-plugin.plugin]
+        [http.middlewares.my-traefik-jwt-headers-plugin.plugin.traefik-jwt-headers-plugin]
+          defaultMode = "drop"
+          [http.middlewares.my-traefik-jwt-headers-plugin.plugin.traefik-jwt-headers-plugin.claims]
+            sub = "keep"
+            mysecret = "drop"
+            user.name = "keep"
+            organization.name = "keep"
 ```
 
 ### File (YAML)
 ```yaml tab="File (YAML)"
 http:
-  middlewares:
-    my-jwt-headers:
-      plugin:
-        jwt-headers:
-          defaultMode: drop
-        claims:
-          sub: keep
-          mysecret: drop
-          user.name: keep
-          organization.name: keep
+    middlewares:
+        my-traefik-jwt-headers-plugin:
+            plugin:
+                traefik-jwt-headers-plugin:
+                    defaultMode: drop
+                    claims:
+                        sub: keep
+                        mysecret: drop
+                        user.name: keep
+                        organization.name: keep
 ```
 
 ## License
