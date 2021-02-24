@@ -9,3 +9,6 @@ testData:
   defaultMode: drop
   claims:
     sub: keep
+    mysecret: drop
+    user.name: keep
+    organization.name: keep
